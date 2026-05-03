@@ -18,9 +18,9 @@ LOGS_DIR.mkdir(exist_ok=True)
 @dataclass
 class AudioConversionConfig:
     """Configuration for MP3 to WAV conversion"""
-    input_format: str = "mp3"
-    output_format: str = "wav"
-    supported_formats: tuple = ("mp3", "m4a", "ogg", "flac")
+    input_format: str = ".mp3"
+    output_format: str = ".wav"
+    supported_formats: tuple = (".mp3", ".m4a", ".ogg", ".flac")
 
 
 @dataclass

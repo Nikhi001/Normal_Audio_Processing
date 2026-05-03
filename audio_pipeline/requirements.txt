@@ -1,5 +1,5 @@
 pydub>=0.25.1
-pydub-stubs>=1.1.0
+pydub-stubs>=0.25.1.6
 audio-separator>=0.17.0
 torch>=2.0.0
 torchaudio>=2.0.0

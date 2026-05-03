@@ -21,13 +21,14 @@ class AudioConverter:
         self.logger = LoggerSetup.setup_logger("AudioConverter")
     
     def convert_file(self, input_path: str, output_path: str, 
-                    output_format: str = "wav") -> bool:
+                    output_format: str = ".wav") -> bool:
         """Convert a single audio file"""
         try:
             self.logger.info(f"Converting: {os.path.basename(input_path)}")
             
             # Load audio file
             audio = AudioSegment.from_file(input_path)
+            print("Converting: ", os.path.basename(input_path))
             
             # Create output directory if needed
             Path(output_path).parent.mkdir(parents=True, exist_ok=True)
@@ -42,36 +43,51 @@ class AudioConverter:
             return False
     
     def convert_directory(self, input_dir: str, output_dir: str, 
-                         input_format: str = "mp3", output_format: str = "wav",
+                         input_format: str = ".mp3", output_format: str = ".wav",
                          recursive: bool = False) -> dict:
         """Convert all audio files in a directory"""
         
         self.logger.info(f"Starting batch conversion from {input_dir}")
         
-        # Find all files with input format
-        files = FileScanner.find_files(input_dir, (f".{input_format}",), recursive)
+        # Check if input_dir is a file
+        if os.path.isfile(input_dir):
+            if input_dir.lower().endswith(f".{input_format}"):
+                files = [input_dir]
+            else:
+                self.logger.error(f"Input file {input_dir} does not match input format {input_format}")
+                return {"total": 0, "success": 0, "failed": 0}
+        else:
+            # Find all files with input format
+            files = FileScanner.find_files(input_dir, (f".{input_format}",), recursive)
         
         if not files:
             self.logger.warning(f"No {input_format} files found in {input_dir}")
             return {"total": 0, "success": 0, "failed": 0}
         
-        # Create output directory
-        Path(output_dir).mkdir(parents=True, exist_ok=True)
+        # If input is a single file, output_dir is the output file path
+        is_single_file = len(files) == 1 and os.path.isfile(input_dir)
+        
+        if not is_single_file:
+            # Create output directory
+            Path(output_dir).mkdir(parents=True, exist_ok=True)
         
         success_count = 0
         failed_count = 0
         
         with tqdm(files, desc="Converting", unit="file", colour="cyan") as pbar:
             for input_file in pbar:
-                # Maintain directory structure if recursive
-                if recursive:
-                    rel_path = os.path.relpath(input_file, input_dir)
-                    output_file = os.path.join(output_dir, 
-                                             os.path.splitext(rel_path)[0] + f".{output_format}")
+                if is_single_file:
+                    output_file = output_dir
                 else:
-                    filename = os.path.basename(input_file)
-                    output_file = os.path.join(output_dir, 
-                                             os.path.splitext(filename)[0] + f".{output_format}")
+                    # Maintain directory structure if recursive
+                    if recursive:
+                        rel_path = os.path.relpath(input_file, input_dir)
+                        output_file = os.path.join(output_dir, 
+                                                 os.path.splitext(rel_path)[0] + f".{output_format}")
+                    else:
+                        filename = os.path.basename(input_file)
+                        output_file = os.path.join(output_dir, 
+                                                 os.path.splitext(filename)[0] + f".{output_format}")
                 
                 pbar.set_postfix(file=os.path.basename(input_file)[:30])
                 
@@ -103,8 +119,8 @@ def main():
     input_folder = get_user_input("Enter input folder path: ", is_path=True)
     output_folder = get_user_input("Enter output folder path: ")
     
-    input_format = input("Enter input format (default: mp3): ").strip() or "mp3"
-    output_format = input("Enter output format (default: wav): ").strip() or "wav"
+    input_format = input("Enter input format (default: .mp3): ").strip() or ".mp3"
+    output_format = input("Enter output format (default: .wav): ").strip() or ".wav"
     
     recursive = input("Include subfolders? (yes/no, default: no): ").strip().lower() in ("yes", "y")
     

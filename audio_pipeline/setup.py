@@ -4,8 +4,13 @@ Setup script for Audio Processing Pipeline
 """
 
 from setuptools import setup, find_packages
+import os
 
-with open("README.md", "r", encoding="utf-8") as fh:
+# Get the directory where this script is located
+setup_dir = os.path.dirname(os.path.abspath(__file__))
+readme_path = os.path.join(setup_dir, "..", "README.md")
+
+with open(readme_path, "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
