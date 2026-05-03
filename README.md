@@ -314,16 +314,3 @@ print(result['formatted_total'])
 ## 📄 License
 
 All rights reserved. For personal use only.
-
-## 🤝 Contributing
-
-Contributions are welcome! Please ensure code follows the existing style.
-
-## 📞 Support
-
-For issues or questions, check the logs in `logs/pipeline.log`
-
----
-
-**Version**: 1.0.0  
-**Last Updated**: 2024
